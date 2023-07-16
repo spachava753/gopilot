@@ -34,7 +34,16 @@ module "vpc" {
 
   azs            = local.azs
   public_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k)]
-  tags = local.tags
+  tags           = local.tags
+}
+
+module "ssh_security_group" {
+  source              = "terraform-aws-modules/security-group/aws//modules/ssh"
+  version             = "~> 5.0"
+  name                = "gopilot-ssh-sg"
+  vpc_id              = module.vpc.vpc_id
+  ingress_cidr_blocks = ["0.0.0.0/0"]
+  tags                = local.tags
 }
 
 module "ec2_instance" {
