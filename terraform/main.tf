@@ -46,6 +46,15 @@ module "ssh_security_group" {
   tags                = local.tags
 }
 
+module "key_pair" {
+  source = "terraform-aws-modules/key-pair/aws"
+
+  key_name           = "gopilot-key"
+  create_private_key = true
+
+  tags = local.tags
+}
+
 module "ec2_instance" {
   source  = "terraform-aws-modules/ec2-instance/aws"
   version = "5.2.1"
@@ -56,6 +65,8 @@ module "ec2_instance" {
   monitoring             = true
   vpc_security_group_ids = [module.vpc.default_security_group_id]
   subnet_id              = module.vpc.public_subnets[0]
+
+  key_name = module.key_pair.key_pair_name
 
   tags = local.tags
 }
