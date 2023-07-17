@@ -10,6 +10,9 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
+// TODO: get rid of dependency of Terraform artifact store,
+//  create a proxy server that will serve artifact
+
 type CreateFolderIfNotExistSuite struct {
 	suite.Suite
 }
