@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 )
@@ -35,4 +36,34 @@ func CreateFolderIfNotExist(path string) error {
 
 	// Folder created successfully
 	return nil
+}
+
+// CopyDirToDir copies an embedded filesystem to a real OS directory
+func CopyDirToDir(src fs.FS, dest string) error {
+	err := fs.WalkDir(
+		src, ".", func(path string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+
+			// Generate full paths
+			embeddedPath := filepath.Join(".", path)
+			targetPath := filepath.Join(dest, path)
+
+			// Handle directories
+			if d.IsDir() {
+				return os.MkdirAll(targetPath, 0755)
+			}
+
+			// Copy files
+			data, err := fs.ReadFile(src, embeddedPath)
+			if err != nil {
+				return err
+			}
+
+			return os.WriteFile(targetPath, data, 0755)
+		},
+	)
+
+	return err
 }
