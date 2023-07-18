@@ -16,9 +16,9 @@ import (
 	"github.com/spachava753/gopilot/pkg/util"
 )
 
-// EnsureTerraform ensures that the right version of the terraform cli is
+// ensureTerraform ensures that the right version of the terraform cli is
 // installed, and returns the exec path
-func EnsureTerraform(ctx context.Context, baseDir string) (string, error) {
+func ensureTerraform(ctx context.Context, baseDir string) (string, error) {
 	info, err := os.Stat(baseDir)
 	if err != nil {
 		return "", fmt.Errorf("could not stat path: %w", err)
@@ -31,12 +31,7 @@ func EnsureTerraform(ctx context.Context, baseDir string) (string, error) {
 		)
 	}
 
-	configPath := path.Join(baseDir, config.Path)
-	if createDirErr := util.CreateFolderIfNotExist(configPath); createDirErr != nil {
-		return "", createDirErr
-	}
-
-	installDir := path.Join(configPath, "terraform-install")
+	installDir := path.Join(baseDir, "terraform-install")
 	if createDirErr := util.CreateFolderIfNotExist(installDir); createDirErr != nil {
 		return "", createDirErr
 	}
@@ -62,4 +57,21 @@ func EnsureTerraform(ctx context.Context, baseDir string) (string, error) {
 	}
 
 	return execPath, nil
+}
+
+func EnsureEnvironment(ctx context.Context, baseDir string) (string, error) {
+	configPath := path.Join(baseDir, config.Path)
+	if createDirErr := util.CreateFolderIfNotExist(configPath); createDirErr != nil {
+		return "", createDirErr
+	}
+
+	tfExecPath, ensureErr := ensureTerraform(ctx, configPath)
+	if ensureErr != nil {
+		return "", fmt.Errorf(
+			"could not ensure terraform is installed: %w",
+			ensureErr,
+		)
+	}
+
+	return tfExecPath, nil
 }

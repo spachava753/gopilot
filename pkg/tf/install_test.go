@@ -13,13 +13,13 @@ type EnsureTerraformTestSuite struct {
 
 func (s *EnsureTerraformTestSuite) TestValidBaseDir() {
 	baseDir := s.T().TempDir()
-	execPath, err := EnsureTerraform(context.TODO(), baseDir)
+	execPath, err := ensureTerraform(context.TODO(), baseDir)
 	s.Assert().NoError(err)
 	s.Assert().FileExists(execPath)
 }
 
 func (s *EnsureTerraformTestSuite) TestInvalidBaseDir() {
-	execPath, err := EnsureTerraform(context.TODO(), "")
+	execPath, err := ensureTerraform(context.TODO(), "")
 	s.Assert().EqualError(
 		err, "could not stat path: stat : no such file or directory",
 	)
